@@ -1,0 +1,968 @@
+<title>CarePath</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F2F4F3;
+    --surface: #FFFFFF;
+    --surface-2: #E7EBE9;
+    --surface-3: #DCE2DF;
+    --ink: #12201C;
+    --ink-muted: #4E5E59;
+    --ink-faint: #7C8B86;
+    --border: #D8DEDB;
+    --border-strong: #C2CBC7;
+    --accent: #0F6B5C;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E3EFEC;
+    --accent-soft-border: #BFDBD3;
+    --danger: #B23C29;
+    --danger-soft: #FBE7E2;
+    --danger-border: #EAB7A8;
+    --warning: #A85F1D;
+    --warning-soft: #FBEEDF;
+    --warning-border: #EAC79A;
+    --success: #2A7D4F;
+    --success-soft: #E4F2E9;
+    --success-border: #B7DCC5;
+    --draft: #6551A8;
+    --draft-soft: #ECE8F7;
+    --draft-border: #CFC5EA;
+    --shadow: 0 1px 2px rgba(18,32,28,0.06), 0 4px 14px rgba(18,32,28,0.05);
+    --font-display: 'Source Serif 4', ui-serif, Georgia, serif;
+    --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101915;
+      --surface: #16211C;
+      --surface-2: #1D2B24;
+      --surface-3: #24352C;
+      --ink: #E9F1ED;
+      --ink-muted: #A2B5AD;
+      --ink-faint: #74887F;
+      --border: #2A3A32;
+      --border-strong: #38493F;
+      --accent: #52BCA3;
+      --accent-ink: #08211B;
+      --accent-soft: #1B342C;
+      --accent-soft-border: #2E5346;
+      --danger: #E38166;
+      --danger-soft: #3B241D;
+      --danger-border: #5A3529;
+      --warning: #DBA25D;
+      --warning-soft: #3A2B18;
+      --warning-border: #574023;
+      --success: #6FC694;
+      --success-soft: #1C3327;
+      --success-border: #2C4C3A;
+      --draft: #B0A3E8;
+      --draft-soft: #29233F;
+      --draft-border: #3D355C;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #101915;
+    --surface: #16211C;
+    --surface-2: #1D2B24;
+    --surface-3: #24352C;
+    --ink: #E9F1ED;
+    --ink-muted: #A2B5AD;
+    --ink-faint: #74887F;
+    --border: #2A3A32;
+    --border-strong: #38493F;
+    --accent: #52BCA3;
+    --accent-ink: #08211B;
+    --accent-soft: #1B342C;
+    --accent-soft-border: #2E5346;
+    --danger: #E38166;
+    --danger-soft: #3B241D;
+    --danger-border: #5A3529;
+    --warning: #DBA25D;
+    --warning-soft: #3A2B18;
+    --warning-border: #574023;
+    --success: #6FC694;
+    --success-soft: #1C3327;
+    --success-border: #2C4C3A;
+    --draft: #B0A3E8;
+    --draft-soft: #29233F;
+    --draft-border: #3D355C;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; color: var(--ink); }
+  p { margin: 0; }
+  button { font-family: var(--font-body); cursor: pointer; }
+  ::selection { background: var(--accent-soft); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .app { height: 100%; display: flex; flex-direction: column; background: var(--bg); }
+
+  .safety-strip {
+    background: var(--warning-soft);
+    border-bottom: 1px solid var(--warning-border);
+    color: var(--warning);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    padding: 7px 20px;
+    text-align: center;
+  }
+  .safety-strip strong { font-weight: 600; }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--accent); color: var(--accent-ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 16px;
+    flex-shrink: 0;
+  }
+  .brand h1 { font-size: 19px; letter-spacing: -0.01em; }
+  .brand-sub { color: var(--ink-faint); font-size: 12px; font-family: var(--font-mono); }
+
+  .patient-chip {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 5px 14px 5px 6px;
+    font-size: 13px;
+  }
+  .patient-chip .avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface-3); display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--ink-muted);
+  }
+  .patient-chip .band-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .shell { display: flex; flex: 1; min-height: 0; }
+
+  .rail {
+    width: 236px; flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    padding: 18px 12px;
+    display: flex; flex-direction: column; gap: 2px;
+    overflow-y: auto;
+  }
+  .rail-group-label {
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-faint);
+    padding: 14px 10px 6px;
+  }
+  .rail-group-label:first-child { padding-top: 4px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    background: transparent; border: 1px solid transparent; border-radius: 9px;
+    padding: 9px 10px; font-size: 13.5px; color: var(--ink-muted);
+    transition: background .12s ease, color .12s ease;
+  }
+  .nav-btn .num {
+    font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint);
+    width: 16px; flex-shrink: 0;
+  }
+  .nav-btn span.label { flex: 1; }
+  .nav-btn:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
+  .nav-btn.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-soft-border); font-weight: 600; }
+  .nav-btn.active .num { color: var(--accent); }
+  .nav-btn:disabled { color: var(--ink-faint); opacity: 0.55; cursor: not-allowed; }
+  .lock-icon { font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint); }
+  .badge-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  .content { flex: 1; min-width: 0; overflow-y: auto; padding: 32px 40px 80px; }
+  .panel { display: none; max-width: 760px; margin: 0 auto; }
+  .panel.active { display: block; animation: fade .25s ease; }
+  @media (prefers-reduced-motion: reduce) { .panel.active { animation: none; } }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px; display: block;
+  }
+  .panel h2 { font-size: 27px; margin-bottom: 6px; }
+  .panel-lede { color: var(--ink-muted); font-size: 14.5px; max-width: 62ch; margin-bottom: 28px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 18px;
+  }
+  .card h3 { font-size: 16px; margin-bottom: 4px; }
+  .card + .card { margin-top: 18px; }
+
+  .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 26px; }
+  @media (max-width: 640px) { .scenario-grid { grid-template-columns: 1fr; } }
+  .scenario-card {
+    text-align: left; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 16px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .scenario-card:hover { border-color: var(--border-strong); }
+  .scenario-card.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .scenario-card .sc-name { font-weight: 600; font-size: 14.5px; }
+  .scenario-card .sc-meta { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); }
+  .scenario-card .sc-complaint { font-size: 12.5px; color: var(--ink-muted); }
+
+  .tier-block { margin-bottom: 16px; }
+  .tier-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .tier-head .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .tier-head h4 { font-size: 12.5px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); font-weight: 600; }
+
+  .symptom-list { display: flex; flex-direction: column; gap: 2px; }
+  .symptom-row {
+    display: flex; align-items: center; gap: 11px;
+    padding: 9px 10px; border-radius: 8px; cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .symptom-row:hover { background: var(--surface-2); }
+  .symptom-row input { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
+  .symptom-row label { font-size: 13.5px; cursor: pointer; }
+
+  .band-banner {
+    border-radius: 12px; padding: 18px 20px; margin: 22px 0; border: 1.5px solid;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .band-banner .bicon { font-family: var(--font-mono); font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .band-banner h4 { font-size: 15.5px; margin-bottom: 4px; }
+  .band-banner p { font-size: 13px; }
+  .band-banner .reasons { margin-top: 8px; font-size: 12.5px; }
+  .band-banner .reasons ul { margin: 4px 0 0; padding-left: 18px; }
+  .band-emergency { background: var(--danger-soft); border-color: var(--danger-border); color: var(--danger); }
+  .band-urgent { background: var(--warning-soft); border-color: var(--warning-border); color: var(--warning); }
+  .band-routine { background: var(--success-soft); border-color: var(--success-border); color: var(--success); }
+  .band-neutral { background: var(--surface-2); border-color: var(--border); color: var(--ink-muted); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 9px;
+    padding: 11px 18px; font-size: 13.5px; font-weight: 600;
+    transition: opacity .12s ease, transform .08s ease;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn.secondary { background: var(--surface-2); color: var(--ink); border: 1px solid var(--border-strong); }
+  .btn.danger-btn { background: var(--danger); color: #fff; }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent-soft-border); }
+  .btn.sm { padding: 7px 12px; font-size: 12.5px; border-radius: 7px; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+
+  .prep-list { display: flex; flex-direction: column; gap: 9px; margin: 14px 0 0; }
+  .prep-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; }
+  .prep-item .chk { font-family: var(--font-mono); color: var(--accent); flex-shrink: 0; }
+
+  .slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0 4px; }
+  @media (max-width: 560px) { .slot-grid { grid-template-columns: repeat(2, 1fr); } }
+  .slot-btn {
+    background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 9px;
+    padding: 10px 8px; font-size: 12.5px; text-align: center; font-family: var(--font-mono);
+    color: var(--ink-muted);
+  }
+  .slot-btn:hover { border-color: var(--border-strong); }
+  .slot-btn.selected { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+  .stepper { display: flex; align-items: center; gap: 6px; margin-bottom: 26px; flex-wrap: wrap; }
+  .step-pill {
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.03em;
+    padding: 5px 10px; border-radius: 999px; background: var(--surface-2); color: var(--ink-faint);
+    border: 1px solid var(--border); white-space: nowrap;
+  }
+  .step-pill.current { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .step-pill.done { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
+  .step-arrow { color: var(--ink-faint); font-size: 11px; }
+
+  .transcript-line { display: flex; gap: 12px; padding: 7px 0; font-size: 13.5px; border-bottom: 1px dashed var(--border); }
+  .transcript-line:last-child { border-bottom: none; }
+  .transcript-line .who {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; width: 40px; flex-shrink: 0; padding-top: 2px;
+  }
+  .who-gp { color: var(--accent); }
+  .who-pt { color: var(--ink-muted); }
+
+  .draft-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+    background: var(--draft-soft); color: var(--draft); border: 1px solid var(--draft-border);
+    border-radius: 999px; padding: 3px 9px; margin-bottom: 12px;
+  }
+  .draft-tag .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--draft); }
+
+  .summary-line { display: flex; gap: 10px; font-size: 13.5px; padding: 6px 0; align-items: flex-start; }
+  .summary-line .src {
+    font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-faint);
+    background: var(--surface-2); border-radius: 5px; padding: 1px 6px; flex-shrink: 0; margin-top: 2px;
+  }
+
+  .action-card {
+    border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 17px; margin-bottom: 12px; background: var(--surface);
+  }
+  .action-card.approved { border-color: var(--success-border); background: var(--success-soft); }
+  .action-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .status-pill {
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.03em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 999px; border: 1px solid; white-space: nowrap; flex-shrink: 0;
+  }
+  .status-discussed { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border-strong); }
+  .status-proposed { background: var(--warning-soft); color: var(--warning); border-color: var(--warning-border); }
+  .status-confirmed { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+  @media (max-width: 560px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-box { border-radius: 8px; padding: 9px 11px; font-size: 12px; }
+  .compare-box.unsafe { background: var(--danger-soft); color: var(--danger); text-decoration: line-through; text-decoration-thickness: 1px; opacity: 0.85; }
+  .compare-box.safe { background: var(--success-soft); color: var(--success); }
+  .compare-label { font-family: var(--font-mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.75; display: block; margin-bottom: 3px; }
+  .evidence-quote { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-faint); border-left: 2px solid var(--border-strong); padding-left: 9px; margin-top: 8px; }
+
+  .med-card { display: flex; gap: 16px; }
+  .med-icon {
+    width: 46px; height: 46px; border-radius: 11px; background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 20px;
+    flex-shrink: 0;
+  }
+  .med-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  @media (max-width: 560px) { .med-grid { grid-template-columns: 1fr; } }
+  .med-field h5 { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-faint); margin-bottom: 4px; font-weight: 600; }
+  .med-field p { font-size: 13px; color: var(--ink-muted); }
+  .med-source { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  .timeline { display: flex; align-items: center; margin: 20px 0; }
+  .tl-step { flex: 1; text-align: center; position: relative; }
+  .tl-step .tl-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2); border: 2px solid var(--border-strong); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); }
+  .tl-step.done .tl-dot { background: var(--success); border-color: var(--success); color: #fff; }
+  .tl-step.now .tl-dot { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .tl-step .tl-label { font-size: 11.5px; color: var(--ink-muted); }
+  .tl-step.now .tl-label { color: var(--accent); font-weight: 600; }
+  .tl-line { position: absolute; top: 13px; left: -50%; width: 100%; height: 2px; background: var(--border-strong); z-index: -1; }
+  .tl-step.done .tl-line, .tl-step.now .tl-line { background: var(--success); }
+  .tl-step:first-child .tl-line { display: none; }
+
+  .reminder-row {
+    display: flex; align-items: center; gap: 12px; padding: 13px 4px; border-bottom: 1px solid var(--border);
+  }
+  .reminder-row:last-child { border-bottom: none; }
+  .reminder-row .r-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .reminder-row .r-body { flex: 1; }
+  .reminder-row .r-label { font-size: 13.5px; font-weight: 500; }
+  .reminder-row .r-date { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-faint); margin-top: 2px; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--ink-faint); }
+  .empty-state p { font-size: 13.5px; }
+
+  .map-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .map-table th { text-align: left; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); padding: 8px 10px; border-bottom: 1px solid var(--border-strong); }
+  .map-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--ink-muted); }
+  .map-table tr:last-child td { border-bottom: none; }
+  .table-wrap { overflow-x: auto; }
+
+  .limit-list { display: flex; flex-direction: column; gap: 4px; }
+  .limit-list li { font-size: 13px; color: var(--ink-muted); padding: 6px 0; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(8px);
+    background: var(--ink); color: var(--bg); font-size: 13px; font-weight: 500;
+    padding: 11px 18px; border-radius: 9px; box-shadow: var(--shadow);
+    opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 860px) {
+    .shell { flex-direction: column; }
+    .rail { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px 14px; border-right: none; border-bottom: 1px solid var(--border); }
+    .rail-group-label { display: none; }
+    .nav-btn { flex-shrink: 0; width: auto; }
+    .content { padding: 24px 18px 60px; }
+  }
+</style>
+
+<div class="app">
+  <div class="safety-strip">PROTOTYPE &mdash; <strong>synthetic patients only</strong> &middot; not a medical device &middot; in a real emergency always call 999 or go to A&amp;E</div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">C</div>
+      <div>
+        <h1>CarePath</h1>
+        <div class="brand-sub">clinician-in-the-loop primary care companion</div>
+      </div>
+    </div>
+    <div class="patient-chip" id="patientChip"></div>
+  </header>
+
+  <div class="shell">
+    <nav class="rail" id="rail"></nav>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+
+  var SYMPTOMS = [
+    { id:'chest', tier:'red', label:'Sudden severe chest pain or pressure' },
+    { id:'breath', tier:'red', label:'Severe breathlessness, can&rsquo;t finish a sentence' },
+    { id:'stroke', tier:'red', label:'Face drooping, arm weakness, or slurred speech' },
+    { id:'bleed', tier:'red', label:'Heavy bleeding that won&rsquo;t stop' },
+    { id:'allergy', tier:'red', label:'Swelling of face/throat, suspected severe allergic reaction' },
+    { id:'seizure', tier:'red', label:'Seizure/fit that won&rsquo;t stop, or unresponsive' },
+    { id:'fever2', tier:'amber', label:'Fever over 39&deg;C for more than 2 days' },
+    { id:'vomit', tier:'amber', label:'Persistent vomiting, can&rsquo;t keep fluids down' },
+    { id:'pain', tier:'amber', label:'Severe pain not controlled by paracetamol' },
+    { id:'confusion', tier:'amber', label:'New or worsening confusion' },
+    { id:'worse', tier:'amber', label:'Symptoms getting worse despite self-care' },
+    { id:'headache', tier:'green', label:'Headache, more persistent than usual' },
+    { id:'throat', tier:'green', label:'Sore throat' },
+    { id:'cough', tier:'green', label:'Mild cough or runny nose' },
+    { id:'tired', tier:'green', label:'Tiredness or mild aches' }
+  ];
+
+  var SCENARIOS = {
+    maya: {
+      id: 'maya', name: 'Maya Reyes', age: 34, initials: 'MR',
+      complaint: 'Headache, persisting 3 days, worse than usual',
+      symptoms: ['headache','worse'],
+      hasConsult: true,
+      transcript: [
+        { who:'gp', text:'What&rsquo;s brought you in today?' },
+        { who:'pt', text:'I&rsquo;ve had a headache for three days now, it&rsquo;s not going away with paracetamol.' },
+        { who:'gp', text:'Any vision changes, neck stiffness, or fever with it?' },
+        { who:'pt', text:'No, none of that. Just constant, dull, behind my eyes.' },
+        { who:'gp', text:'Okay. It sounds like a tension-type headache, but given three days, you may need blood tests just to rule things out.' },
+        { who:'pt', text:'Okay, that sounds sensible.' },
+        { who:'gp', text:'I&rsquo;ll send a prescription for a stronger paracetamol dose to try for a few more days.' },
+        { who:'gp', text:'Go to A&E if it suddenly gets much worse, you get vision changes, or a stiff neck with fever.' },
+        { who:'gp', text:'Let&rsquo;s review in two weeks if it hasn&rsquo;t settled by then.' }
+      ],
+      summaryLines: [
+        { text:'34F presenting with 3-day history of persistent headache, dull and bilateral, retro-orbital. No red-flag features on direct questioning.', src:'L2,L4' },
+        { text:'No visual disturbance, neck stiffness or fever reported.', src:'L4' },
+        { text:'Working impression: tension-type headache. Investigation discussed to exclude other causes.', src:'L5' },
+        { text:'Analgesia adjustment discussed. Safety-netting and follow-up discussed.', src:'L7&ndash;L9' }
+      ],
+      actions: [
+        { id:'bloods', title:'Blood tests', status:'discussed', unsafe:'Blood tests ordered', safe:'Investigation discussed &mdash; GP to confirm whether a test request was actually submitted.', quote:'&ldquo;you may need blood tests&rdquo;' },
+        { id:'rx', title:'Prescription &mdash; paracetamol', status:'discussed', unsafe:'Medication prescribed and sent to pharmacy', safe:'Paracetamol (higher-dose course) suggested &mdash; clinician to confirm medicine, dose and pharmacy route before anything is sent.', quote:'&ldquo;I&rsquo;ll send a prescription for a stronger paracetamol dose&rdquo;' },
+        { id:'safety', title:'Safety-netting', status:'proposed', unsafe:'General advice only, not recorded', safe:'Seek urgent assessment (111/A&E) if: sudden worst-ever headache, vision changes, or neck stiffness with fever.', quote:'&ldquo;Go to A&E if it suddenly gets much worse&hellip;&rdquo;' },
+        { id:'followup', title:'Follow-up review', status:'proposed', unsafe:'Appointment automatically booked', safe:'Review proposed in 2 weeks &mdash; booking status to be confirmed with reception.', quote:'&ldquo;Let&rsquo;s review in two weeks&hellip;&rdquo;' }
+      ],
+      medication: {
+        name: 'Paracetamol', use: 'Relief of mild-to-moderate pain and fever',
+        dose: 'Adults: up to 1g (two 500mg tablets), up to 4 times in 24 hours, at least 4 hours apart. Do not exceed 4g in 24 hours.',
+        side: 'Generally well tolerated. Rare: skin rash, blood disorders with prolonged use.',
+        warn: 'Overdose can cause serious liver damage &mdash; check other medicines and cold/flu remedies don&rsquo;t already contain paracetamol. Use caution with liver disease or regular heavy alcohol use.',
+        seek: 'If you think you&rsquo;ve taken more than the maximum dose &mdash; even without symptoms &mdash; this is a medical emergency. Contact 111 or your nearest A&E.'
+      },
+      labTest: true, followUpWeeks: 2
+    },
+    jonah: {
+      id:'jonah', name:'Jonah Whitfield', age:58, initials:'JW',
+      complaint:'Sudden crushing chest pain, sweating, breathless',
+      symptoms: ['chest','breath'],
+      hasConsult:false
+    },
+    priya: {
+      id:'priya', name:'Priya Anand', age:27, initials:'PA',
+      complaint:'Sore throat, runny nose, mild tiredness, started yesterday',
+      symptoms: ['throat','cough','tired'],
+      hasConsult: true,
+      transcript: [
+        { who:'gp', text:'What symptoms have you noticed?' },
+        { who:'pt', text:'Sore throat, a bit of a runny nose, and I&rsquo;ve felt tired since yesterday.' },
+        { who:'gp', text:'No fever, no trouble swallowing, breathing is fine?' },
+        { who:'pt', text:'No, breathing&rsquo;s fine, no fever that I&rsquo;ve noticed.' },
+        { who:'gp', text:'This sounds like a common viral infection. It should settle on its own within a week.' },
+        { who:'gp', text:'Rest, fluids, and paracetamol or ibuprofen if needed for comfort.' },
+        { who:'gp', text:'Come back or call 111 if you develop a high fever, struggle to swallow fluids, or it isn&rsquo;t improving after a week.' }
+      ],
+      summaryLines: [
+        { text:'27F with 1-day history of sore throat, rhinorrhoea and mild fatigue. No fever, no dysphagia, no respiratory compromise.', src:'L2,L4' },
+        { text:'Working impression: self-limiting viral upper respiratory tract infection.', src:'L5' },
+        { text:'Conservative management and safety-netting discussed; no prescription or investigation indicated today.', src:'L6&ndash;L7' }
+      ],
+      actions: [
+        { id:'selfcare', title:'Self-care', status:'confirmed', unsafe:'No action recorded', safe:'Rest, fluids, and OTC paracetamol/ibuprofen for comfort &mdash; no prescription indicated.', quote:'&ldquo;Rest, fluids, and paracetamol or ibuprofen if needed&rdquo;' },
+        { id:'safety', title:'Safety-netting', status:'proposed', unsafe:'General advice only, not recorded', safe:'Seek review (111/GP) if: high fever develops, swallowing fluids becomes difficult, or no improvement after 7 days.', quote:'&ldquo;Come back or call 111 if&hellip; isn&rsquo;t improving after a week&rdquo;' }
+      ],
+      medication: {
+        name: 'Paracetamol', use: 'Relief of mild-to-moderate pain and fever',
+        dose: 'Adults: up to 1g (two 500mg tablets), up to 4 times in 24 hours, at least 4 hours apart. Do not exceed 4g in 24 hours.',
+        side: 'Generally well tolerated. Rare: skin rash, blood disorders with prolonged use.',
+        warn: 'Overdose can cause serious liver damage &mdash; check other medicines and cold/flu remedies don&rsquo;t already contain paracetamol.',
+        seek: 'If you think you&rsquo;ve taken more than the maximum dose &mdash; even without symptoms &mdash; this is a medical emergency. Contact 111 or your nearest A&E.'
+      },
+      labTest:false, followUpWeeks:1
+    }
+  };
+
+  var state = {
+    scenarioId: null,
+    checked: {},
+    band: null,
+    section: 'symptom',
+    unlocked: { symptom:true, emergency:false, appointment:false, consult:false, actionplan:false, pharmacy:false, reminders:true, safety:true },
+    appointment: { slot:null, booked:false, type:null, happened:false },
+    approvals: {},
+    allApproved: false,
+    pharmacyStatus: 'sent',
+    reminders: []
+  };
+
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function esc(s){ return (s||'').replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+
+  function toast(msg){
+    var t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toast._h); toast._h = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+  }
+
+  function currentScenario(){ return state.scenarioId ? SCENARIOS[state.scenarioId] : null; }
+
+  function computeBand(){
+    var any = function(tier){ return Object.keys(state.checked).some(function(id){ return state.checked[id] && SYMPTOMS.find(function(s){return s.id===id;}).tier===tier; }); };
+    if (any('red')) return 'emergency';
+    if (any('amber')) return 'urgent';
+    if (any('green')) return 'routine';
+    return null;
+  }
+
+  function selectScenario(id){
+    state.scenarioId = id;
+    state.checked = {};
+    SCENARIOS[id].symptoms.forEach(function(s){ state.checked[s] = true; });
+    state.band = computeBand();
+    // Switching patient starts a new episode of care — every downstream
+    // unlock and approval from a previous patient must not carry over.
+    state.unlocked.appointment = false;
+    state.unlocked.emergency = false;
+    state.unlocked.consult = false;
+    state.unlocked.actionplan = false;
+    state.unlocked.pharmacy = false;
+    state.appointment = { slot:null, booked:false, type:null, happened:false };
+    state.approvals = {};
+    state.allApproved = false;
+    state.pharmacyStatus = 'sent';
+    render();
+  }
+
+  function toggleSymptom(id){
+    state.checked[id] = !state.checked[id];
+    state.band = computeBand();
+    if (state.band !== 'emergency' && state.unlocked.emergency){
+      state.unlocked.emergency = false;
+      if (state.section === 'emergency') state.section = 'symptom';
+    }
+    render();
+  }
+
+  function proceedFromSymptoms(){
+    if (state.band === 'emergency'){
+      state.unlocked.emergency = true;
+      go('emergency');
+      addReminder('Safety-net check &mdash; red-flag symptoms reported', 'Today', 'danger');
+    } else if (state.band) {
+      state.unlocked.appointment = true;
+      go('appointment');
+    }
+  }
+
+  function bookSlot(slot){ state.appointment.slot = slot; render(); }
+  function confirmAppointment(){
+    if (!state.appointment.slot) return;
+    state.appointment.booked = true;
+    state.appointment.type = state.band === 'urgent' ? 'Urgent &mdash; same day' : 'Routine';
+    addReminder('GP appointment &mdash; ' + currentScenario().name, state.appointment.slot, 'accent');
+    render();
+  }
+  function fastForward(){
+    state.appointment.happened = true;
+    state.unlocked.consult = currentScenario().hasConsult;
+    if (state.unlocked.consult) go('consult'); else toast('Appointment complete &mdash; no consultation record for this scenario.');
+    render();
+  }
+
+  function approvalKey(sc, actionId){ return sc.id + ':' + actionId; }
+
+  function approveAction(id){
+    var sc = currentScenario();
+    state.approvals[approvalKey(sc, id)] = true;
+    state.allApproved = sc.actions.every(function(a){ return state.approvals[approvalKey(sc, a.id)]; });
+    if (state.allApproved){
+      state.unlocked.actionplan = true;
+      var hasRx = sc.actions.some(function(a){ return a.id==='rx'; });
+      if (hasRx) state.unlocked.pharmacy = true;
+    }
+    render();
+  }
+  function approveAll(){
+    var sc = currentScenario();
+    sc.actions.forEach(function(a){ state.approvals[approvalKey(sc, a.id)] = true; });
+    state.allApproved = true;
+    state.unlocked.actionplan = true;
+    if (sc.actions.some(function(a){ return a.id==='rx'; })) state.unlocked.pharmacy = true;
+    if (sc.followUpWeeks) addReminder('Follow-up review due', 'in ' + sc.followUpWeeks + ' week' + (sc.followUpWeeks>1?'s':''), 'warning');
+    if (sc.labTest) addReminder('Book blood test', 'this week', 'accent');
+    render();
+    toast('All actions approved &mdash; patient summary unlocked');
+  }
+
+  function advancePharmacy(){
+    if (state.pharmacyStatus==='sent') state.pharmacyStatus='preparing';
+    else if (state.pharmacyStatus==='preparing') state.pharmacyStatus='ready';
+    if (state.pharmacyStatus==='ready') addReminder('Collect prescription &mdash; ready at pharmacy', 'today', 'success');
+    render();
+  }
+
+  var remId = 1;
+  function addReminder(label, date, kind){
+    if (state.reminders.some(function(r){ return r.label===label; })) return;
+    state.reminders.push({ id: remId++, label:label, date:date, kind:kind||'accent', added:false });
+  }
+  function toggleReminderAdded(id){
+    var r = state.reminders.find(function(r){ return r.id===id; });
+    if (r){ r.added = !r.added; toast(r.added ? 'Added to calendar (simulated)' : 'Removed'); }
+    render();
+  }
+
+  function go(section){
+    if (!state.unlocked[section]) return;
+    state.section = section;
+    render();
+    $('#content').scrollTop = 0;
+  }
+
+  var NAV = [
+    { group:'Care journey', items:[
+      { id:'symptom', label:'Symptom check', num:'01' },
+      { id:'emergency', label:'Emergency guidance', num:'02' },
+      { id:'appointment', label:'Appointment', num:'03' },
+      { id:'consult', label:'Consultation review', num:'04' },
+      { id:'actionplan', label:'Action plan & medication', num:'05' },
+      { id:'pharmacy', label:'Pharmacy', num:'06' }
+    ]},
+    { group:'Stay on track', items:[
+      { id:'reminders', label:'Reminders & calendar', num:'07' }
+    ]},
+    { group:'About this prototype', items:[
+      { id:'safety', label:'Safety & evidence base', num:'08' }
+    ]}
+  ];
+
+  function renderRail(){
+    var html = '';
+    NAV.forEach(function(g){
+      html += '<div class="rail-group-label">'+g.group+'</div>';
+      g.items.forEach(function(it){
+        if (it.id==='emergency' && !state.unlocked.emergency) return;
+        var locked = !state.unlocked[it.id];
+        var active = state.section===it.id;
+        html += '<button class="nav-btn'+(active?' active':'')+'" data-nav="'+it.id+'" '+(locked?'disabled':'')+'>'
+              + '<span class="num">'+it.num+'</span><span class="label">'+it.label+'</span>'
+              + (locked ? '<span class="lock-icon">&#128274;</span>' : '')
+              + '</button>';
+      });
+    });
+    $('#rail').innerHTML = html;
+    $all('[data-nav]', $('#rail')).forEach(function(b){
+      b.addEventListener('click', function(){ go(b.getAttribute('data-nav')); });
+    });
+  }
+
+  function renderPatientChip(){
+    var sc = currentScenario();
+    if (!sc){ $('#patientChip').innerHTML = '<span style="color:var(--ink-faint);font-size:13px;">No patient selected</span>'; return; }
+    var bandColor = { emergency:'var(--danger)', urgent:'var(--warning)', routine:'var(--success)' }[state.band] || 'var(--ink-faint)';
+    $('#patientChip').innerHTML = '<div class="avatar">'+sc.initials+'</div>'
+      + '<span>'+sc.name+', '+sc.age+'</span>'
+      + '<span class="band-dot" style="background:'+bandColor+'"></span>';
+  }
+
+  function bandInfo(band){
+    return {
+      emergency: { cls:'band-emergency', icon:'!!!', title:'This needs emergency care &mdash; call 999 or go to A&E', desc:'Based on the symptoms selected, this pattern matches red-flag criteria. Do not wait for a GP appointment.' },
+      urgent: { cls:'band-urgent', icon:'!', title:'Contact your GP today, or call NHS 111', desc:'These symptoms warrant same-day attention rather than routine booking.' },
+      routine: { cls:'band-routine', icon:'&#10003;', title:'A routine GP appointment is reasonable', desc:'Nothing urgent flagged. You can book routinely, or try self-care first and book if it doesn&rsquo;t settle.' }
+    }[band];
+  }
+
+  function renderSymptom(){
+    var scOptions = Object.keys(SCENARIOS).map(function(id){
+      var sc = SCENARIOS[id];
+      return '<button class="scenario-card'+(state.scenarioId===id?' selected':'')+'" data-scenario="'+id+'">'
+           + '<span class="sc-name">'+sc.name+'</span>'
+           + '<span class="sc-meta">age '+sc.age+' &middot; synthetic patient</span>'
+           + '<span class="sc-complaint">"'+sc.complaint+'"</span>'
+           + '</button>';
+    }).join('');
+
+    var tiers = [
+      { tier:'red', label:'Red flags', dot:'var(--danger)' },
+      { tier:'amber', label:'Worsening / concerning', dot:'var(--warning)' },
+      { tier:'green', label:'Common, everyday symptoms', dot:'var(--success)' }
+    ];
+    var symptomsHtml = tiers.map(function(t){
+      var rows = SYMPTOMS.filter(function(s){ return s.tier===t.tier; }).map(function(s){
+        return '<div class="symptom-row"><input type="checkbox" id="sym-'+s.id+'" '+(state.checked[s.id]?'checked':'')+' data-symptom="'+s.id+'">'
+             + '<label for="sym-'+s.id+'">'+s.label+'</label></div>';
+      }).join('');
+      return '<div class="tier-block"><div class="tier-head"><span class="dot" style="background:'+t.dot+'"></span><h4>'+t.label+'</h4></div><div class="symptom-list">'+rows+'</div></div>';
+    }).join('');
+
+    var bannerHtml = '';
+    if (state.band){
+      var b = bandInfo(state.band);
+      var causalTier = { emergency:'red', urgent:'amber', routine:'green' }[state.band];
+      var reasons = Object.keys(state.checked).filter(function(id){ return state.checked[id] && SYMPTOMS.find(function(s){return s.id===id;}).tier===causalTier; })
+        .map(function(id){ return SYMPTOMS.find(function(s){return s.id===id;}).label; });
+      bannerHtml = '<div class="band-banner '+b.cls+'"><span class="bicon">'+b.icon+'</span><div>'
+        + '<h4>'+b.title+'</h4><p>'+b.desc+'</p>'
+        + '<div class="reasons">Based on: <ul>'+reasons.map(function(r){return '<li>'+r+'</li>';}).join('')+'</ul></div>'
+        + '</div></div>';
+    } else {
+      bannerHtml = '<div class="band-banner band-neutral"><span class="bicon">?</span><div><h4>Select the symptoms that apply</h4><p>Choose a synthetic patient above, or tick symptoms yourself to see how the checklist reasons about urgency.</p></div></div>';
+    }
+
+    $('#content').innerHTML =
+      '<span class="eyebrow">Step 1 of 6</span><h2>What&rsquo;s going on?</h2>'
+    + '<p class="panel-lede">This is a transparent, rule-based checklist &mdash; like NHS 111&rsquo;s triage logic &mdash; not a free-form AI diagnosis. It always errs toward caution, and you can see exactly why it reached its answer.</p>'
+    + '<div class="scenario-grid">'+scOptions+'</div>'
+    + '<div class="card"><h3>Symptom checklist</h3><p style="color:var(--ink-faint);font-size:12.5px;margin-top:2px;">Tick everything that applies right now.</p>'
+    + '<div style="margin-top:16px;">'+symptomsHtml+'</div></div>'
+    + bannerHtml
+    + '<div class="btn-row"><button class="btn" id="btnProceed" '+(state.band?'':'disabled')+'>'
+    + (state.band==='emergency' ? 'View emergency guidance &rarr;' : 'Continue to booking &rarr;') + '</button></div>';
+
+    $all('[data-scenario]').forEach(function(b){ b.addEventListener('click', function(){ selectScenario(b.getAttribute('data-scenario')); }); });
+    $all('[data-symptom]').forEach(function(b){ b.addEventListener('click', function(){ toggleSymptom(b.getAttribute('data-symptom')); }); });
+    var btn = $('#btnProceed'); if (btn) btn.addEventListener('click', proceedFromSymptoms);
+  }
+
+  function renderEmergency(){
+    var reasons = Object.keys(state.checked).filter(function(id){ return state.checked[id] && SYMPTOMS.find(function(s){return s.id===id;}).tier==='red'; })
+      .map(function(id){ return SYMPTOMS.find(function(s){return s.id===id;}).label; });
+    $('#content').innerHTML =
+      '<span class="eyebrow" style="color:var(--danger);">Emergency guidance</span><h2>Call 999 or go to your nearest A&amp;E now</h2>'
+    + '<p class="panel-lede">This app does not decide emergencies for you &mdash; the red-flag symptoms you reported match established emergency criteria, and the safest response is always to seek immediate in-person care.</p>'
+    + '<div class="card"><h3>Why this recommendation</h3><ul class="limit-list">'+reasons.map(function(r){return '<li>&mdash; '+r+'</li>';}).join('')+'</ul></div>'
+    + '<div class="card"><h3>What this prototype does <em>not</em> do</h3><p style="color:var(--ink-muted);font-size:13.5px;">In line with NHS guidance on ambient/AI clinical tools, this app never places an emergency call, books an ambulance, or overrides your judgement. It only surfaces a clear, explainable recommendation and gets out of the way. In a real emergency, call 999 immediately.</p></div>'
+    + '<div class="btn-row"><button class="btn danger-btn" id="btnAckEmergency">I understand &mdash; log a safety-net reminder</button> <button class="btn secondary" id="btnRestart">Start over</button></div>';
+    $('#btnAckEmergency').addEventListener('click', function(){ toast('Safety-net reminder logged'); go('reminders'); });
+    $('#btnRestart').addEventListener('click', function(){ state.scenarioId=null; state.checked={}; state.band=null; state.unlocked.emergency=false; go('symptom'); });
+  }
+
+  function renderAppointment(){
+    var sc = currentScenario();
+    var slots = ['Tue 10:20','Tue 15:40','Wed 09:00'];
+    var slotsHtml = slots.map(function(s){
+      return '<button class="slot-btn'+(state.appointment.slot===s?' selected':'')+'" data-slot="'+s+'">'+s+'</button>';
+    }).join('');
+
+    var prepItems = [
+      'Bring a current list of any medicines you take, including over-the-counter ones',
+      'Note when the symptoms started and anything that makes them better or worse',
+      'Bring photo ID if you&rsquo;re new to the practice',
+      'Arrive 5 minutes early to check in'
+    ];
+
+    $('#content').innerHTML =
+      '<span class="eyebrow">Step 2 of 6</span><h2>Book your appointment</h2>'
+    + '<p class="panel-lede">Recommended: <strong>'+ (state.band==='urgent' ? 'urgent, same-day' : 'routine') +'</strong> appointment for '+sc.name+'.</p>'
+    + '<div class="card"><h3>What your GP wants from you</h3><div class="prep-list">'+prepItems.map(function(p){return '<div class="prep-item"><span class="chk">&#10003;</span><span>'+p+'</span></div>';}).join('')+'</div></div>'
+    + '<div class="card"><h3>Choose a time</h3><div class="slot-grid">'+slotsHtml+'</div>'
+    + (state.appointment.booked
+        ? '<p style="margin-top:14px;font-size:13.5px;color:var(--success);">&#10003; Confirmed &mdash; '+state.appointment.type+', '+state.appointment.slot+'</p>'
+          + '<div class="btn-row"><button class="btn" id="btnFF">Fast-forward: appointment has happened &rarr;</button></div>'
+        : '<div class="btn-row"><button class="btn" id="btnConfirm" '+(state.appointment.slot?'':'disabled')+'>Confirm appointment</button></div>')
+    + '</div>';
+
+    $all('[data-slot]').forEach(function(b){ b.addEventListener('click', function(){ bookSlot(b.getAttribute('data-slot')); }); });
+    var cb = $('#btnConfirm'); if (cb) cb.addEventListener('click', confirmAppointment);
+    var fb = $('#btnFF'); if (fb) fb.addEventListener('click', fastForward);
+  }
+
+  function renderConsult(){
+    var sc = currentScenario();
+    var steps = ['Consultation','Transcript','Draft summary','Draft actions','GP review','Patient summary'];
+    var stepIdx = state.allApproved ? 5 : 3;
+    var stepperHtml = steps.map(function(s,i){
+      var cls = i<stepIdx ? 'done' : (i===stepIdx ? 'current' : '');
+      return '<span class="step-pill '+cls+'">'+s+'</span>' + (i<steps.length-1 ? '<span class="step-arrow">&rarr;</span>' : '');
+    }).join('');
+
+    var transcriptHtml = sc.transcript.map(function(t,i){
+      return '<div class="transcript-line"><span class="who '+(t.who==='gp'?'who-gp':'who-pt')+'">'+(t.who==='gp'?'GP':'Pt')+' L'+(i+1)+'</span><span>'+t.text+'</span></div>';
+    }).join('');
+
+    var summaryHtml = sc.summaryLines.map(function(l){
+      return '<div class="summary-line"><span class="src">'+l.src+'</span><span>'+l.text+'</span></div>';
+    }).join('');
+
+    var actionsHtml = sc.actions.map(function(a){
+      var approved = !!state.approvals[approvalKey(sc, a.id)];
+      var statusClass = approved ? 'status-confirmed' : (a.status==='proposed' ? 'status-proposed' : 'status-discussed');
+      var statusLabel = approved ? 'Confirmed by GP' : (a.status.charAt(0).toUpperCase()+a.status.slice(1));
+      return '<div class="action-card'+(approved?' approved':'')+'">'
+        + '<div class="action-head"><h3 style="font-size:14.5px;">'+a.title+'</h3><span class="status-pill '+statusClass+'">'+statusLabel+'</span></div>'
+        + '<div class="compare-grid">'
+        + '<div class="compare-box unsafe"><span class="compare-label">Unsafe assumption</span>'+a.unsafe+'</div>'
+        + '<div class="compare-box safe"><span class="compare-label">Safer output</span>'+a.safe+'</div>'
+        + '</div>'
+        + '<div class="evidence-quote">Evidence: '+a.quote+'</div>'
+        + (approved ? '' : '<div class="btn-row"><button class="btn sm" data-approve="'+a.id+'">Approve as GP</button></div>')
+        + '</div>';
+    }).join('');
+
+    $('#content').innerHTML =
+      '<span class="eyebrow">Step 3 of 6</span><h2>Consultation review</h2>'
+    + '<p class="panel-lede">This screen is only ever seen and actioned by the clinician in the real product. Every AI draft stays unverified until a human approves it &mdash; nothing here is written to a record or shown to the patient yet.</p>'
+    + '<div class="stepper">'+stepperHtml+'</div>'
+    + '<div class="card"><h3>Transcript (synthetic)</h3>'+transcriptHtml+'</div>'
+    + '<div class="card"><span class="draft-tag"><span class="pulse"></span>AI draft &mdash; unverified</span><h3>Draft summary</h3>'+summaryHtml+'</div>'
+    + '<div class="card"><span class="draft-tag"><span class="pulse"></span>AI draft &mdash; unverified</span><h3>Draft actions</h3><p style="color:var(--ink-faint);font-size:12.5px;margin:2px 0 14px;">Conversation talk vs. an authorised action are never the same thing until a clinician confirms it.</p>'+actionsHtml
+    + (state.allApproved ? '' : '<div class="btn-row"><button class="btn" id="btnApproveAll">Approve all & finalize &rarr;</button></div>')
+    + '</div>'
+    + (state.allApproved ? '<div class="card" style="border-color:var(--success-border);background:var(--success-soft);"><h3 style="color:var(--success);">&#10003; All actions confirmed</h3><p style="font-size:13.5px;color:var(--success);">The patient summary and action plan are now unlocked.</p><div class="btn-row"><button class="btn" id="btnToPlan">View action plan &rarr;</button></div></div>' : '');
+
+    $all('[data-approve]').forEach(function(b){ b.addEventListener('click', function(){ approveAction(b.getAttribute('data-approve')); }); });
+    var aa = $('#btnApproveAll'); if (aa) aa.addEventListener('click', approveAll);
+    var tp = $('#btnToPlan'); if (tp) tp.addEventListener('click', function(){ go('actionplan'); });
+  }
+
+  function renderActionPlan(){
+    var sc = currentScenario();
+    var actionsHtml = sc.actions.map(function(a){
+      return '<div class="action-card approved"><div class="action-head"><h3 style="font-size:14.5px;">'+a.title+'</h3><span class="status-pill status-confirmed">Confirmed</span></div><p style="font-size:13px;color:var(--ink-muted);">'+a.safe+'</p></div>';
+    }).join('');
+
+    var med = sc.medication;
+    var medHtml = '<div class="card"><div class="med-card"><div class="med-icon">Rx</div><div style="flex:1;"><h3>'+med.name+'</h3><p style="font-size:12.5px;color:var(--ink-faint);">'+med.use+'</p>'
+      + '<div class="med-grid">'
+      + '<div class="med-field"><h5>Typical dose</h5><p>'+med.dose+'</p></div>'
+      + '<div class="med-field"><h5>Common side effects</h5><p>'+med.side+'</p></div>'
+      + '<div class="med-field"><h5>Warnings</h5><p>'+med.warn+'</p></div>'
+      + '<div class="med-field"><h5>Seek help if</h5><p>'+med.seek+'</p></div>'
+      + '</div>'
+      + '<div class="med-source">Source: NHS medicines information / BNF (adapted for this prototype) &mdash; evidence-based reference, independent of anything the clinician said in conversation.</div>'
+      + '</div></div></div>';
+
+    var nextSteps = '';
+    if (sc.labTest) nextSteps += '<div class="prep-item"><span class="chk">&rarr;</span><span>Blood test discussed &mdash; book with the on-site lab/phlebotomy team. <button class="btn sm ghost" id="btnBookLab">Add reminder</button></span></div>';
+    if (sc.actions.some(function(a){return a.id==='rx';})) nextSteps += '<div class="prep-item"><span class="chk">&rarr;</span><span>Prescription confirmed &mdash; GP will forward it to your nominated pharmacy. <button class="btn sm ghost" id="btnGoPharmacy">Track in Pharmacy</button></span></div>';
+    if (sc.followUpWeeks) nextSteps += '<div class="prep-item"><span class="chk">&rarr;</span><span>Follow-up proposed in '+sc.followUpWeeks+' week'+(sc.followUpWeeks>1?'s':'')+'. <button class="btn sm ghost" id="btnGoReminders">Add to calendar</button></span></div>';
+
+    $('#content').innerHTML =
+      '<span class="eyebrow">Step 4 of 6</span><h2>Your action plan</h2>'
+    + '<p class="panel-lede">GP-approved. Written in plain English, backed by evidence &mdash; not just relying on what was said verbally.</p>'
+    + '<div class="card"><h3>Agreed actions</h3>'+actionsHtml+'</div>'
+    + medHtml
+    + '<div class="card"><h3>Further steps</h3><div class="prep-list">'+nextSteps+'</div></div>';
+
+    var bl = $('#btnBookLab'); if (bl) bl.addEventListener('click', function(){ addReminder('Book blood test', 'this week', 'accent'); toast('Reminder added'); render(); });
+    var gp = $('#btnGoPharmacy'); if (gp) gp.addEventListener('click', function(){ go('pharmacy'); });
+    var gr = $('#btnGoReminders'); if (gr) gr.addEventListener('click', function(){ go('reminders'); });
+  }
+
+  function renderPharmacy(){
+    var sc = currentScenario();
+    var stages = ['Sent by GP','Being prepared','Ready to collect'];
+    var idx = { sent:0, preparing:1, ready:2 }[state.pharmacyStatus];
+    var tlHtml = stages.map(function(s,i){
+      var cls = i<idx ? 'done' : (i===idx ? 'now' : '');
+      return '<div class="tl-step '+cls+'"><div class="tl-line"></div><div class="tl-dot">'+(i<idx?'&#10003;':(i+1))+'</div><div class="tl-label">'+s+'</div></div>';
+    }).join('');
+
+    $('#content').innerHTML =
+      '<span class="eyebrow">Step 5 of 6</span><h2>Pharmacy</h2>'
+    + '<p class="panel-lede">'+sc.medication.name+' for '+sc.name+' &mdash; forwarded by your GP after their explicit confirmation. Nothing here is sent automatically without that sign-off.</p>'
+    + '<div class="card"><h3>Prescription status</h3><div class="timeline">'+tlHtml+'</div>'
+    + (state.pharmacyStatus!=='ready' ? '<div class="btn-row"><button class="btn secondary" id="btnCheck">Check for updates</button></div>' : '<p style="color:var(--success);font-size:13.5px;margin-top:6px;">&#10003; Ready for collection at your nominated pharmacy.</p><div class="btn-row"><button class="btn" id="btnCollectRem">Add collection reminder</button></div>')
+    + '</div>'
+    + '<div class="card"><h3>Request repeat or ask a question</h3><p style="font-size:13px;color:var(--ink-muted);margin-bottom:10px;">In this prototype, requests are simulated &mdash; no message is actually sent.</p><div class="btn-row"><button class="btn secondary sm" id="btnRepeat">Request repeat prescription</button></div></div>';
+
+    var ck = $('#btnCheck'); if (ck) ck.addEventListener('click', function(){ advancePharmacy(); toast('Status updated'); });
+    var cr = $('#btnCollectRem'); if (cr) cr.addEventListener('click', function(){ toast('Reminder added'); go('reminders'); });
+    var rp = $('#btnRepeat'); if (rp) rp.addEventListener('click', function(){ toast('Repeat request simulated (no real message sent)'); });
+  }
+
+  function renderReminders(){
+    var rows = state.reminders.length ? state.reminders.map(function(r){
+      var color = { danger:'var(--danger)', warning:'var(--warning)', success:'var(--success)', accent:'var(--accent)' }[r.kind];
+      return '<div class="reminder-row"><span class="r-dot" style="background:'+color+'"></span>'
+        + '<div class="r-body"><div class="r-label">'+r.label+'</div><div class="r-date">'+r.date+'</div></div>'
+        + '<button class="btn sm '+(r.added?'':'secondary')+'" data-toggle-rem="'+r.id+'">'+(r.added?'Added &#10003;':'Add to calendar')+'</button>'
+        + '</div>';
+    }).join('') : '<div class="empty-state"><p>No reminders yet &mdash; they&rsquo;ll appear here as you move through your care journey.</p></div>';
+
+    $('#content').innerHTML =
+      '<span class="eyebrow">Step 6 of 6</span><h2>Reminders &amp; calendar</h2>'
+    + '<p class="panel-lede">Every reminder here traces back to something actually discussed or confirmed in your care journey.</p>'
+    + '<div class="card"><h3>Your reminders</h3>'+rows+'</div>'
+    + '<p style="font-size:12px;color:var(--ink-faint);font-family:var(--font-mono);">Prototype note: in the full product this creates a real Google Calendar / Outlook event via calendar API. Here, "Add to calendar" simulates the confirmation only.</p>';
+
+    $all('[data-toggle-rem]').forEach(function(b){ b.addEventListener('click', function(){ toggleReminderAdded(Number(b.getAttribute('data-toggle-rem'))); }); });
+  }
+
+  function renderSafety(){
+    var rows = [
+      ['Omissions dominate over hallucinations, and are harder to catch on review', 'Every draft line is source-linked to a transcript quote; nothing enters a record unreviewed'],
+      ['Plan/action section is the highest-risk zone &mdash; tentative talk gets over-committed into firm actions', 'Explicit status taxonomy: Discussed &rarr; Proposed &rarr; Confirmed &mdash; never defaults to "done"'],
+      ['Tools must never autonomously decide what a patient "needs"', 'Triage is a transparent, deterministic checklist &mdash; not free-text AI judgement &mdash; and always defers to 999/A&E for red flags'],
+      ['Governance for consent, retention and audit trails is often unspecified', 'This prototype uses only synthetic patients; every status change is visible, nothing is sent externally'],
+      ['Overreliance risks automation bias and loss of clinician synthesis skills', 'Patient-facing summary is hard-locked until a clinician approves every action &mdash; no shortcut in this demo'],
+      ['Accuracy degrades in multiparty, complex or non-English consultations', 'Not solved here &mdash; flagged explicitly below as an open limitation']
+    ];
+    var tableHtml = '<table class="map-table"><thead><tr><th>Evidence finding</th><th>Design response in this prototype</th></tr></thead><tbody>'
+      + rows.map(function(r){ return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'; }).join('') + '</tbody></table>';
+
+    var openLimits = [
+      'Multiparty, complex or non-English consultations are not modelled &mdash; real accuracy would need dedicated evaluation.',
+      'No EMR/GP Connect/FHIR integration &mdash; this is a standalone demo, not connected to a real clinical record.',
+      'No formal clinical risk assessment (DCB0129/DCB0160) or MHRA software-as-a-medical-device classification has been carried out.',
+      'No real consent, identity verification, or data-protection flow &mdash; required before any real patient data could be used.',
+      'The literature recommends a systematic scoping review and stakeholder co-design before a live prototype &mdash; this build is illustrative only, not that review.'
+    ];
+
+    $('#content').innerHTML =
+      '<span class="eyebrow">Design rationale</span><h2>Safety &amp; evidence base</h2>'
+    + '<p class="panel-lede">This prototype was built against a critical review of AI clinical-documentation literature (Draper et al. 2025; Williams et al. 2025; Asgari et al. 2025; Ohde et al. 2026, among others) and supervisory advice recommending a clinician-in-the-loop design using synthetic data only.</p>'
+    + '<div class="card"><h3>Evidence &rarr; design mapping</h3><div class="table-wrap">'+tableHtml+'</div></div>'
+    + '<div class="card"><h3>Known limitations &mdash; not solved by this prototype</h3><ul class="limit-list">'+openLimits.map(function(l){return '<li>&mdash; '+l+'</li>';}).join('')+'</ul></div>'
+    + '<div class="card"><h3>Data</h3><p style="font-size:13.5px;color:var(--ink-muted);">All patients, transcripts and consultations in this prototype are entirely fictional. No real patient data is used, stored, or transmitted.</p></div>';
+  }
+
+  function render(){
+    renderRail();
+    renderPatientChip();
+    var map = { symptom:renderSymptom, emergency:renderEmergency, appointment:renderAppointment, consult:renderConsult, actionplan:renderActionPlan, pharmacy:renderPharmacy, reminders:renderReminders, safety:renderSafety };
+    (map[state.section] || renderSymptom)();
+  }
+
+  render();
+})();
+</script>
